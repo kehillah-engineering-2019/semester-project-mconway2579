@@ -8,8 +8,11 @@ Servo servo1;
 int temp;
 boolean isopen;
 
+int fanpin = 7;
+
 void setup(){
   servo1.attach(9);
+  pinMode(fanpin, OUTPUT);
   Serial.begin(9600);
   delay(500);//Delay to let system boot
   Serial.println("DHT22 Humidity & temperature Sensor\n\n");
@@ -22,18 +25,18 @@ void loop(){
   //Start of Program 
  
     DHT.read22(dht_apin);
-    temp = (DHT.temperature * (9/5)) + (32);
+    temp = (DHT.temperature * (9/5) + (32));
     Serial.print("Current humidity = ");
     Serial.print(DHT.humidity);
     Serial.print("%  ");
     Serial.print("temperature = ");
     Serial.print(temp); 
     Serial.println("F  ");
-    if(temp >= 102){
+    if(temp >= 55){
       open();
       isopen = true; 
     }
-    if(isopen && temp <=99){
+    if(isopen && temp <=54){
       close();
       isopen = false;
     }
@@ -44,15 +47,12 @@ void loop(){
 }// end loop() 
 
 void open(){
-  for (int pos = 0; pos <= 90; pos += 1) { // goes from 0 degrees to 180 degrees
-    // in steps of 1 degree
-    servo1.write(pos); // tell servo to go to position in variable 'pos'
+  servo1.write(180); 
+  digitalWrite(fanpin, HIGH);
   }
 
-}
 void close(){
-  for (int pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
-    servo1.write(pos);              // tell servo to go to position in variable 'pos'
-  }
+  servo1.write(90);
+  digitalWrite(fanpin, LOW);
 }
 
