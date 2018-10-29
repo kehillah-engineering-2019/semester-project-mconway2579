@@ -1,22 +1,37 @@
+#define USE_ARDUINO_INTERRUPTS true
+#include <PulseSensorPlayground.h>
 
 #include <dht.h>
-#include <Servo.h>
-#define dht_apin A0 // Analog Pin sensor is connected to
+
+
+#define dht_apin A0
  
 dht DHT;
-Servo servo1;
 int temp;
-boolean isopen;
 
-int fanpin = 7;
+
+int fanpin = 8;
+
+const int PulseWire = A1;
+int Threshold = 550;
+
+PulseSensorPlayground pulseSensor;
 
 void setup(){
-  servo1.attach(9);
   pinMode(fanpin, OUTPUT);
   Serial.begin(9600);
   delay(500);//Delay to let system boot
   Serial.println("DHT22 Humidity & temperature Sensor\n\n");
+
+  pulseSensor.analogInput(PulseWire);
+  pulseSensor.setThreshold(Threshold);
+  if (pulseSensor.begin()) {
+    Serial.println("We created a pulseSensor Object !");  //This prints one time at Arduino power-up,  or on Arduino reset.  
+  }
+  
   delay(1000);//Wait before accessing Sensor
+
+
 
  
 }//end "setup()"
@@ -32,27 +47,45 @@ void loop(){
     Serial.print("temperature = ");
     Serial.print(temp); 
     Serial.println("F  ");
-    if(temp >= 55){
-      open();
-      isopen = true; 
+
+    if(temp >= 102){
+      cool();
     }
-    if(isopen && temp <=54){
-      close();
-      isopen = false;
+    if(temp <=99){
+      heat();
     }
+    pulse();
+    
+
+    
     delay(2000);//Wait 5 seconds before accessing sensor again.
  
   //Fastest should be once every two seconds.
  
 }// end loop() 
 
-void open(){
-  servo1.write(180); 
+
+
+
+void cool(){
   digitalWrite(fanpin, HIGH);
   }
 
-void close(){
-  servo1.write(90);
+void heat(){
   digitalWrite(fanpin, LOW);
 }
+
+void pulse(){
+ int myBPM = pulseSensor.getBeatsPerMinute();  // Calls function on our pulseSensor object that returns BPM as an "int".
+                                               // "myBPM" hold this BPM value now. 
+
+ if (pulseSensor.sawStartOfBeat()) {            // Constantly test to see if "a beat happened". 
+ Serial.println("♥  A HeartBeat Happened ! "); // If test is "true", print a message "a heartbeat happened".
+ Serial.print("BPM: ");                        // Print phrase "BPM: " 
+ Serial.println(myBPM);                        // Print the value inside of myBPM. 
+ }
+}
+
+
+
 
