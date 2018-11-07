@@ -11,6 +11,8 @@ int temp;
 
 
 int fanpin = 8;
+int heatpin = 9;
+int heatsetting = 0;
 
 const int PulseWire = A1;
 int Threshold = 550;
@@ -69,10 +71,15 @@ void loop(){
 
 void cool(){
   digitalWrite(fanpin, HIGH);
+  heatsetting += -10;
+  analogWrite(heatpin, heatsetting);
   }
 
 void heat(){
   digitalWrite(fanpin, LOW);
+  heatsetting += 10;
+  analogWrite(heatpin, heatsetting);
+  
 }
 
 void pulse(){
@@ -85,6 +92,7 @@ void pulse(){
  Serial.println(myBPM);                        // Print the value inside of myBPM. 
  }
 }
+
 
 
 
