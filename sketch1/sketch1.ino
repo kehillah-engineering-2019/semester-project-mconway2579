@@ -9,10 +9,11 @@ unsigned long time;
  
 dht DHT;
 int temp;
+boolean heating =false;
 
 
-int fanpin = 8;
-int transistorPin = 7;
+int fanpin = 5;
+int transistorPin = 6;
 
 const int PulseWire = A1;
 int Threshold = 550;
@@ -73,19 +74,17 @@ void loop(){
 void cool(){
   digitalWrite(fanpin, HIGH);
   digitalWrite(transistorPin, LOW);
+  heating = false;
   }
 
 void heat(){
   digitalWrite(fanpin, LOW);
   digitalWrite(transistorPin, HIGH); 
+  heating = true;
 }
 
 void printTemp(){
- Serial.print("Time: ");
- time = millis();
-
- Serial.println(time);
-
+ Serial.println(heating);
   
  Serial.print("%  ");
  Serial.print("temperature = ");
